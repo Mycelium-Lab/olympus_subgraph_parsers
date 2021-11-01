@@ -37,7 +37,21 @@ export async function getManageByDay(startTimestamp=0,endTimestamp=Date.now()/10
     }
 }
 
-
+export async function getDepositByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+    try{
+        let bigArray=await reformToBigArrayForHour(await getDepositByHoursFromGraph());
+     
+        for(let i=0;i<bigArray.length;i++){
+            bigArray[i].array=fillBigArrayForNDays( bigArray[i].array,startTimestamp,endTimestamp,n);
+        }
+        
+        return bigArray;
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+}
 async function getManageByDaysFromGraph(){
     try{
         const dayData = await axios({
@@ -163,4 +177,31 @@ function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
         timestamp+=day;
     }
     return out;
+}
+
+
+function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
+    let data=[]
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*day; beginTimestamp < endTime; beginTimestamp += days*day, endTimestamp+=days*day)
+    {
+      let obj = {
+        timestamp: beginTimestamp,
+        endTimestamp: endTimestamp,
+        amount: 0,
+        sumAmount:data.length==0?0:data[data.length-1].sumAmount,
+        sender:[]
+      }
+      for(let j = 0; j < stakes.length; ++j)
+      {
+        
+        if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
+        {
+          obj.amount += Number(stakes[j].amount)
+          obj.sumAmount = Number(stakes[j].sumAmount)
+          obj.sender.concat(stakes[j].sender)
+        }
+      }
+      data.push(obj)
+    }
+    return data
 }

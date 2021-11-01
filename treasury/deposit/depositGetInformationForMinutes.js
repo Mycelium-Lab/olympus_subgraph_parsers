@@ -45,6 +45,21 @@ export async function getDepositByMinut(startTimestamp=0,endTimestamp=Date.now()
     }
 }
 
+export async function getDepositByNMinute(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+    try{
+        let bigArray=await reformToBigArrayForHour(await getDepositByHoursFromGraph());
+     
+        for(let i=0;i<bigArray.length;i++){
+            bigArray[i].array=fillBigArrayForNMinutes( bigArray[i].array,startTimestamp,endTimestamp,n);
+        }
+        
+        return bigArray;
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+}
 /**
  * struct from subgrph reform to array
  * @param {} days struct from subgrph
@@ -161,4 +176,38 @@ function fillBigArrayForMinues(bigArray,startTimestamp,endTimestamp){
         timestamp+=minute;
     }
     return out;
+}
+
+function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
+    let data=[]
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
+    {
+      let obj = {
+        timestamp: beginTimestamp,
+        endTimestamp: endTimestamp,
+        amount: 0,
+        profit: 0,
+        value: 0,
+        sumAmount:data.length==0?0:data[data.length-1].sumAmount,
+        sumProfit:data.length==0?0:data[data.length-1].sumProfit,
+        sumValue:data.length==0?0:data[data.length-1].sumValue,
+        sender:[]
+      }
+      for(let j = 0; j < stakes.length; ++j)
+      {
+        
+        if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
+        {
+          obj.amount += Number(stakes[j].amount)
+          obj.profit += Number(stakes[j].profit)
+          obj.value += Number(stakes[j].value)
+          obj.sumValue = Number(stakes[j].sumValue)
+          obj.sumProfit = Number(stakes[j].sumProfit)
+          obj.sumAmount = Number(stakes[j].sumAmount)
+          obj.sender.concat(stakes[j].sender)
+        }
+      }
+      data.push(obj)
+    }
+    return data
 }

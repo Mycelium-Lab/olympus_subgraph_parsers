@@ -21,9 +21,8 @@ const minuteQuery =`
        }
      }
    }
-   }
-   
-  `
+}
+`
 
 export async function getManageByMinut(startTimestamp=0,endTimestamp=Date.now()/1000){
     try{
@@ -41,6 +40,22 @@ export async function getManageByMinut(startTimestamp=0,endTimestamp=Date.now()/
     }
 }
 
+
+export async function getManageByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+    try{
+        let bigArray=await reformToBigArrayForHour(await getManageByHoursFromGraph());
+     
+        for(let i=0;i<bigArray.length;i++){
+            bigArray[i].array=fillBigArrayForNHours( bigArray[i].array,startTimestamp,endTimestamp,n);
+        }
+        
+        return bigArray;
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+}
 
 async function getManageByMinutesFromGraph(){
     try{
@@ -176,4 +191,30 @@ function fillBigArrayForMinutes(bigArray,startTimestamp,endTimestamp){
         timestamp+=minute;
     }
     return out;
+}
+
+function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
+    let data=[]
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
+    {
+      let obj = {
+        timestamp: beginTimestamp,
+        endTimestamp: endTimestamp,
+        amount: 0,
+        sumAmount:data.length==0?0:data[data.length-1].sumAmount,
+        sender:[]
+      }
+      for(let j = 0; j < stakes.length; ++j)
+      {
+        
+        if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
+        {
+          obj.amount += Number(stakes[j].amount)
+          obj.sumAmount = Number(stakes[j].sumAmount)
+          obj.sender.concat(stakes[j].sender)
+        }
+      }
+      data.push(obj)
+    }
+    return data
 }

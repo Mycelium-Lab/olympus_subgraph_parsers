@@ -43,7 +43,22 @@ export async function getDepositByHour(startTimestamp=0,endTimestamp=Date.now()/
     }
 }
 
-export async function getDepositBy4Hour(startTimestamp=0,endTimestamp=Date.now()/1000){
+export async function getDepositByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+    try{
+        let bigArray=await reformToBigArrayForHour(await getDepositByHoursFromGraph());
+     
+        for(let i=0;i<bigArray.length;i++){
+            bigArray[i].array=fillBigArrayForNHours( bigArray[i].array,startTimestamp,endTimestamp,n);
+        }
+        
+        return bigArray;
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+}
+export async function getDepositByNHour(startTimestamp=0,endTimestamp=Date.now()/1000){
     try{
         let bigArray=await reformToBigArrayForHour(await getDepositByHoursFromGraph());
      
