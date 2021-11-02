@@ -37,7 +37,7 @@ export async function getManageByDay(startTimestamp=0,endTimestamp=Date.now()/10
     }
 }
 
-export async function getDepositByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getManageByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
         let bigArray=await reformToBigArrayForHour(await getDepositByHoursFromGraph());
      
