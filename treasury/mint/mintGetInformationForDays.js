@@ -28,6 +28,15 @@ export async function getMintRewardsByDays(startTimestamp=0,endTimestamp=Date.no
     }
 }
 
+export async function getMintRewardsByNDays(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+    try{
+        return fillBigArrayForNDays(reformToBigArrayForDays(await getTotalReserveByDaysFromGraph()),startTimestamp,endTimestamp,n)
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+}
 
 async function getTotalReserveByDaysFromGraph(){
     try{
@@ -117,4 +126,31 @@ function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
         timestamp+=day;
     }
     return out;
+}
+
+
+function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
+    let data=[]
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*day; beginTimestamp < endTime; beginTimestamp += days*day, endTimestamp+=days*day)
+    {
+      let obj = {
+        timestamp: beginTimestamp,
+        endTimestamp: endTimestamp,
+        amount: 0,
+        recipient:[],
+        caller:[]
+      }
+      for(let j = 0; j < stakes.length; ++j)
+      {
+        
+        if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
+        {
+          obj.amount += Number(stakes[j].amount)
+          obj.recipient.concat(stakes[j].recipient)
+          obj.caller.concat(stakes[j].caller)
+        }
+      }
+      data.push(obj)
+    }
+    return data
 }

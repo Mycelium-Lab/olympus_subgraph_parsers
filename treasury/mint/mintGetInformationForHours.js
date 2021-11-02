@@ -33,9 +33,9 @@ export async function getMintRewardsByHours(startTimestamp=0,endTimestamp=Date.n
     }
 }
 
-export async function getMintRewardsBy4Hours(startTimestamp=0,endTimestamp=Date.now()/1000){
+export async function getMintRewardsByNHours(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayFor4Hours(reformToBigArrayForHours(await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp)
+        return fillBigArrayForNHours(reformToBigArrayForHours(await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp,n)
     }
     catch(err)
     {
@@ -260,7 +260,7 @@ function fillBigArrayFor4Hours(bigArray,startTimestamp,endTimestamp){
 
 function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
     let data=[]
-    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*3600; beginTimestamp < endTime; beginTimestamp += hours*3600, endTimestamp+=hours*3600)
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*hour; beginTimestamp < endTime; beginTimestamp += hours*hour, endTimestamp+=hours*hour)
     {
       let obj = {
         timestamp: beginTimestamp,

@@ -34,6 +34,16 @@ export async function getMintRewardsByMinutes(startTimestamp=0,endTimestamp=Date
 }
 
 
+export async function getMintRewardsByNMinutes(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+    try{
+        return fillBigArrayForNMinutes(reformToBigArrayForMinutes(await getTotalReserveByMinutesFromGraph()),startTimestamp,endTimestamp,n)
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+}
+
 async function getTotalReserveByMinutesFromGraph(){
     try{
         const minuteData = await axios({
@@ -64,6 +74,7 @@ function reformToBigArrayForMinutes(days){
     }
     return out;
 }
+
 /**
  * fills the array and divides it into equal time intervals
  * @param {*} bigArray  
@@ -88,7 +99,6 @@ function fillBigArrayForMinutes(bigArray,startTimestamp,endTimestamp){
         timestamp+=minute;
         while(timestamp<nextTimestamp){
             if (timestamp>endTimestamp) return out;
-
             if(timestamp>=startTimestamp){
                 out.push({
                     amount:0,
@@ -99,10 +109,8 @@ function fillBigArrayForMinutes(bigArray,startTimestamp,endTimestamp){
             }
             timestamp+=minute;
         }
-        
     }
     out.push({
-      
         timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),minute),
         amount:bigArray[bigArray.length-1].amount,
         recipient:bigArray[bigArray.length-1].recipient,
@@ -122,4 +130,29 @@ function fillBigArrayForMinutes(bigArray,startTimestamp,endTimestamp){
     }
 
     return out;
+}
+
+function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
+    let data=[]
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
+    {
+      let obj = {
+        timestamp: beginTimestamp,
+        endTimestamp: endTimestamp,
+        amount: 0,
+        recipient:[],
+        caller:[]
+      }
+      for(let j = 0; j < stakes.length; ++j)
+      {
+        if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
+        {
+          obj.amount += Number(stakes[j].amount)
+          obj.recipient.concat(stakes[j].recipient)
+          obj.caller.concat(stakes[j].caller)
+        }
+      }
+      data.push(obj)
+    }
+    return data
 }
