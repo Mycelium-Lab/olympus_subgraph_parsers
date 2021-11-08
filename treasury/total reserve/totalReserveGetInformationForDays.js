@@ -16,15 +16,6 @@ const dayQuery =`
 `
 
 
-export async function getTotalReserveByDay(startTimestamp=0,endTimestamp=Date.now()/1000) {
-    try{
-        return fillBigArrayForDays(reformToBigArrayForDays( await getTotalReserveByDaysFromGraph()),startTimestamp,endTimestamp);
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
 
 export async function getTotalReserveByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{

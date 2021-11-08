@@ -23,17 +23,7 @@ const hourQuery =`
 
   `
 
-export async function getMintRewardsByHours(startTimestamp=0,endTimestamp=Date.now()/1000){
-    try{
-        return fillBigArrayForHours(reformToBigArrayForHours(await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp)
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
-
-export async function getMintRewardsByNHours(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getMintRewardsByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
         return fillBigArrayForNHours(reformToBigArrayForHours(await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp,n)
     }

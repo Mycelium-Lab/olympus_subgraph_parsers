@@ -19,24 +19,8 @@ const hourQuery =`
 `
 
 
-export async function getTotalReserveByHour(startTimestamp=0,endTimestamp=Date.now()/1000){
-    try{
-        return fillBigArrayForHours(reformToBigArrayForHours( await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp);
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
-export async function getTotalReserveBy4Hour(startTimestamp=0,endTimestamp=Date.now()/1000){
-    try{
-        return fillBigArrayForNHours(reformToBigArrayForHours( await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp,4);
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
+
+
 export async function getTotalReserveByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
         return fillBigArrayForNHours(reformToBigArrayForHours( await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp,n);

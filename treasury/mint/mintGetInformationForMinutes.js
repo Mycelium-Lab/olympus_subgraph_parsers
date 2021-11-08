@@ -23,18 +23,10 @@ const minuteQuery =`
 
   `
 
-export async function getMintRewardsByMinutes(startTimestamp=0,endTimestamp=Date.now()/1000){
-    try{
-        return fillBigArrayForMinutes(reformToBigArrayForMinutes(await getTotalReserveByMinutesFromGraph()),startTimestamp,endTimestamp)
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
 
 
-export async function getMintRewardsByNMinutes(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+
+export async function getMintRewardsByNMinut(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
         return fillBigArrayForNMinutes(reformToBigArrayForMinutes(await getTotalReserveByMinutesFromGraph()),startTimestamp,endTimestamp,n)
     }

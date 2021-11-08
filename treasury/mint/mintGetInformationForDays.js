@@ -18,17 +18,9 @@ const dayQuery =`
   }
   `
 
-export async function getMintRewardsByDays(startTimestamp=0,endTimestamp=Date.now()/1000){
-    try{
-        return fillBigArrayForDays(reformToBigArrayForDays(await getTotalReserveByDaysFromGraph()),startTimestamp,endTimestamp)
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
 
-export async function getMintRewardsByNDays(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+
+export async function getMintRewardsByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
         return fillBigArrayForNDays(reformToBigArrayForDays(await getTotalReserveByDaysFromGraph()),startTimestamp,endTimestamp,n)
     }

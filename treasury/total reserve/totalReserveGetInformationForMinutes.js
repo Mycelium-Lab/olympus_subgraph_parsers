@@ -22,15 +22,6 @@ const minuteQuery =`
 
   `
 
-export async function getTotalReserveByMinut(startTimestamp=0,endTimestamp=Date.now()/1000){
-    try{
-        return fillBigArrayForMinues(reformToBigArrayForMinutes(await getTotalReserveByMinutesFromGraph()),startTimestamp,endTimestamp)
-    }
-    catch(err)
-    {
-        console.log(err)
-    }
-}
 
 export async function getTotalReserveByNMinut(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
