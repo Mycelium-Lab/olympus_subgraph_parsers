@@ -171,14 +171,16 @@ function fillBigArrayForMinues(bigArray,startTimestamp,endTimestamp){
             if (timestamp>endTimestamp) return out;
         }        
     }
-    if(out[out.length-1].timestamp!=getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*minute)){
-        out.push({
-            totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
-            timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*minute),
-            audited:bigArray[bigArray.length-1].audited,
-        })
-    }else{
-        out[out.length-1].totalReserves=bigArray[bigArray.length-1].finalTotalReserves;
+    if(out.length>0){
+        if(out[out.length-1].timestamp!=getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*minute)){
+            out.push({
+                totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+                timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*minute),
+                audited:bigArray[bigArray.length-1].audited,
+            })
+        }else{
+            out[out.length-1].totalReserves=bigArray[bigArray.length-1].finalTotalReserves;
+        }
     }
     let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*minute);
     timestamp+=n*minute;
@@ -189,6 +191,13 @@ function fillBigArrayForMinues(bigArray,startTimestamp,endTimestamp){
             audited:false,
         });
         timestamp+=n*minute;
+    }
+    if(out.length==0){
+        out.push({
+            totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+            timestamp:timestamp-n*minute,
+            audited:false,
+        })
     }
     return out;
 }

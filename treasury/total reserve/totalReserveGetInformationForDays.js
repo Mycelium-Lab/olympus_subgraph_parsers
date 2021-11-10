@@ -159,14 +159,16 @@ function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
             if (timestamp>endTimestamp) return out;
         }        
     }
-    if(out[out.length-1].timestamp!=getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*day)){
-        out.push({
-            totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
-            timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*day),
-            audited:bigArray[bigArray.length-1].audited,
-        })
-    }else{
-        out[out.length-1].totalReserves=bigArray[bigArray.length-1].finalTotalReserves;
+    if(out.length>0){
+        if(out[out.length-1].timestamp!=getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*day)){
+            out.push({
+                totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+                timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*day),
+                audited:bigArray[bigArray.length-1].audited,
+            })
+        }else{
+            out[out.length-1].totalReserves=bigArray[bigArray.length-1].finalTotalReserves;
+        }
     }
     let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*day);
     timestamp+=n*day;
@@ -177,6 +179,13 @@ function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
             audited:false,
         });
         timestamp+=n*day;
+    }
+    if(out.length==0){
+        out.push({
+            totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+            timestamp:timestamp-n*day,
+            audited:false,
+        })
     }
     return out;
 }
