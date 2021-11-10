@@ -121,74 +121,100 @@ function fillBigArrayForHours(bigArray,startTimestamp,endTimestamp){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForNHours(bigArray,startTimestamp,endTimestamp,n){
-    let out = [];
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),n*hour)
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),n*hour)
-        if (timestamp>endTimestamp) return out;
-        if(timestamp>=startTimestamp){
-            if(out.length!=0&&out[out.length-1].timestamp==timestamp){
-                out[out.length-1].audited= out[out.length-1].audited?true:bigArray[i-1].audited;
-                out[out.length-1].totalReserves=bigArray[i-1].finalTotalReserves;
-            }
-            else{
-                out.push({
-                    totalReserves:bigArray[i-1].finalTotalReserves,
-                    timestamp:timestamp,
-                    audited:bigArray[i-1].audited,
-                });
-            }
+// function fillBigArrayForNHours(bigArray,startTimestamp,endTimestamp,n){
+//     let out = [];
+//     let j=0;
+//     while(bigArray[j].timestamp<startTimestamp) j++;
+//     for(let i=j==0?1:j;i<bigArray.length;i++){
+//         let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),n*hour)
+//         let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),n*hour)
+//         if (timestamp>endTimestamp) return out;
+//         if(timestamp>=startTimestamp){
+//             if(out.length!=0&&out[out.length-1].timestamp==timestamp){
+//                 out[out.length-1].audited= out[out.length-1].audited?true:bigArray[i-1].audited;
+//                 out[out.length-1].totalReserves=bigArray[i-1].finalTotalReserves;
+//             }
+//             else{
+//                 out.push({
+//                     totalReserves:bigArray[i-1].finalTotalReserves,
+//                     timestamp:timestamp,
+//                     audited:bigArray[i-1].audited,
+//                 });
+//             }
+//         }
+//         timestamp+=n*hour;
+//         if (timestamp>endTimestamp) return out;
+//         while(timestamp<nextTimestamp){
+//             if(timestamp>=startTimestamp){
+//                 if(out.length!=0&&out[out.length-1].timestamp==timestamp){
+//                     out[out.length-1].audited= out[out.length-1].audited?true:bigArray[i-1].audited;
+//                     out[out.length-1].totalReserves=bigArray[i-1].finalTotalReserves;
+//                 }
+//                 else{
+//                     out.push({
+//                         totalReserves:bigArray[i-1].finalTotalReserves,
+//                         timestamp:timestamp,
+//                         audited:false,
+//                     });
+//                 }
+//             }
+//             timestamp+=n*hour;
+//             if (timestamp>endTimestamp) return out;
+//         }        
+//     }
+//     if(out.length>0){
+//         if(out[out.length-1].timestamp!=getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*hour)){
+//             out.push({
+//                 totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+//                 timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*hour),
+//                 audited:bigArray[bigArray.length-1].audited,
+//             })
+//         }else{
+//             out[out.length-1].totalReserves=bigArray[bigArray.length-1].finalTotalReserves;
+//         }
+//     }
+//     let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*hour);
+//     timestamp+=n*hour;
+//     while(timestamp<=endTimestamp){
+//         out.push({
+//             totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+//             timestamp:timestamp,
+//             audited:false,
+//         });
+//         timestamp+=n*hour;
+//     }
+//     if(out.length==0){
+//         out.push({
+//             totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
+//             timestamp:timestamp-n*hour,
+//             audited:false,
+//         })
+//     }
+//     return out;
+// }
+
+
+
+function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
+    let data=[]
+    for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*hour; beginTimestamp < endTime; beginTimestamp += hours*hour, endTimestamp+=hours*hour)
+    {
+      let obj = {
+        timestamp: beginTimestamp,
+        endTimestamp: endTimestamp,
+        totalReserves:data.length>0?data[data.length-1].totalReserves:0 ,
+        audited:false,
+      }
+      for(let j = 0; j < stakes.length; ++j)
+      {
+        
+        if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
+        {
+            obj.totalReserves = Number(stakes[j].totalReserves)
+            obj.audited= stakes[j].audited
         }
-        timestamp+=n*hour;
-        if (timestamp>endTimestamp) return out;
-        while(timestamp<nextTimestamp){
-            if(timestamp>=startTimestamp){
-                if(out.length!=0&&out[out.length-1].timestamp==timestamp){
-                    out[out.length-1].audited= out[out.length-1].audited?true:bigArray[i-1].audited;
-                    out[out.length-1].totalReserves=bigArray[i-1].finalTotalReserves;
-                }
-                else{
-                    out.push({
-                        totalReserves:bigArray[i-1].finalTotalReserves,
-                        timestamp:timestamp,
-                        audited:false,
-                    });
-                }
-            }
-            timestamp+=n*hour;
-            if (timestamp>endTimestamp) return out;
-        }        
+      }
+      data.push(obj)
     }
-    if(out.length>0){
-        if(out[out.length-1].timestamp!=getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*hour)){
-            out.push({
-                totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
-                timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*hour),
-                audited:bigArray[bigArray.length-1].audited,
-            })
-        }else{
-            out[out.length-1].totalReserves=bigArray[bigArray.length-1].finalTotalReserves;
-        }
-    }
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),n*hour);
-    timestamp+=n*hour;
-    while(timestamp<=endTimestamp){
-        out.push({
-            totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
-            timestamp:timestamp,
-            audited:false,
-        });
-        timestamp+=n*hour;
-    }
-    if(out.length==0){
-        out.push({
-            totalReserves:bigArray[bigArray.length-1].finalTotalReserves,
-            timestamp:timestamp-n*hour,
-            audited:false,
-        })
-    }
-    return out;
+    return data
 }
