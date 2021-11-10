@@ -142,7 +142,7 @@ export async function getRebasesInfoNDays(startTimestamp, endTime, days)
           if(beginTimestamp <= data[j].timestamp && data[j].timestamp < endTimestamp)
           {
             rebasesCount++
-            percentageSum += data[j].percentage
+            percentageSum += Number(data[j].percentage)
           }
         }
         let apy = Math.pow((1 + (Number(percentageSum)/rebasesCount)), 1095)
@@ -314,7 +314,7 @@ export async function getRebasesInfoNHours(startTimestamp, endTime, hours)
           if(beginTimestamp <= data[j].timestamp && data[j].timestamp < endTimestamp)
           {
             rebasesCount++
-            percentageSum += data[j].percentage
+            percentageSum += Number(data[j].percentage)
           }
         }
         let apy = Math.pow((1 + (Number(percentageSum)/rebasesCount)), 1095)
@@ -499,7 +499,7 @@ export async function getRebasesInfoNMinutes(startTimestamp, endTime, minutes)
           if(beginTimestamp <= data[j].timestamp && data[j].timestamp < endTimestamp)
           {
             rebasesCount++
-            percentageSum += data[j].percentage
+            percentageSum += Number(data[j].percentage)
           }
         }
         let apy = Math.pow((1 + (Number(percentageSum)/rebasesCount)), 1095)
