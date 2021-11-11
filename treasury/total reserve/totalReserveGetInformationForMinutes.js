@@ -210,7 +210,7 @@ function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
       let obj = {
         timestamp: beginTimestamp,
         endTimestamp: endTimestamp,
-        totalReserves:data.length>0?data[data.length-1].finalTotalReserves:0 ,
+        totalReserves:data.length>0?data[data.length-1].totalReserves:0 ,
         audited:false,
       }
       for(let j = 0; j < stakes.length; ++j)
