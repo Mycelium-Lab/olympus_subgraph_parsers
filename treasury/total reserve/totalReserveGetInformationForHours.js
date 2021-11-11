@@ -202,7 +202,7 @@ function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
       let obj = {
         timestamp: beginTimestamp,
         endTimestamp: endTimestamp,
-        totalReserves:data.length>0?data[data.length-1].totalReserves:0 ,
+        totalReserves:data.length>0?data[data.length-1].finalTotalReserves:0 ,
         audited:false,
       }
       for(let j = 0; j < stakes.length; ++j)
@@ -210,7 +210,7 @@ function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
         
         if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
         {
-            obj.totalReserves = Number(stakes[j].totalReserves)
+            obj.totalReserves = Number(stakes[j].finalTotalReserves)
             obj.audited= stakes[j].audited
         }
       }

@@ -124,7 +124,7 @@ function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
 //     while(bigArray[j].timestamp<startTimestamp) j++;
 //     for(let i=j==0?1:j;i<bigArray.length;i++){
 //         let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),n*day)
-//         let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),n*day)
+//         let timestamp=(parseInt(bigArray[i-1].timestamp),n*day)
 //         if (timestamp>endTimestamp) return out;
 //         if(timestamp>=startTimestamp){
 //             if(out.length!=0&&out[out.length-1].timestamp==timestamp){
@@ -198,15 +198,16 @@ function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
       let obj = {
         timestamp: beginTimestamp,
         endTimestamp: endTimestamp,
-        totalReserves:data.length>0?data[data.length-1].totalReserves:0 ,
+        totalReserves:data.length>0?data[data.length-1].finalTotalReserves:0 ,
         audited:false,
       }
+      console.log(stakes[0])
       for(let j = 0; j < stakes.length; ++j)
       {
         
         if(beginTimestamp <= stakes[j].timestamp && stakes[j].timestamp < endTimestamp)
         {
-            obj.totalReserves = Number(stakes[j].totalReserves)
+            obj.totalReserves = Number(stakes[j].finalTotalReserves)
             obj.audited= stakes[j].audited
         }
       }
