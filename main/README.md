@@ -1,13 +1,13 @@
-# olympus-query
+# Main (Staking, Bonds, Rebases)
 This repository contains functions for sending requests to a custom Olympus subgraph.
-- Functions for getting stakes info for 1 day/1 hour/n hours/1 minute interval presented in stakes.js
-- Functions for getting deposits info for 1 day/1 hour/n hours/1 minute interval presented in deposits.js
-- Functions for getting rebases info for 1 day interval presented in rebases.js
+- Functions for getting stakes info for N day/hour/minute interval presented in stakes.js
+- Functions for getting deposits info for N day/hour/minute interval presented in deposits.js
+- Functions for getting rebases (APY) info for N day/hour/minute presented in rebases.js
 
 ## Install
 
-    $ git clone https://github.com/limenal/olympus-query
-    $ cd olympus-query
+    $ git clone https://github.com/Mycelium-Lab/olympus_subgraphs.git
+    $ cd main
     $ npm install
     
 ## Running the project

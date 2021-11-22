@@ -1,11 +1,11 @@
-# sushi-swap-ohm
+# SushiSwap-OHM
 This repository contains functions for sending requests to a custom Sushi Swap subgraph.
-- Functions for getting swaps info for 1 day/1 hour/n hours/1 minute interval presented in pairs.js
+- Functions for getting swaps info for N day/hour/minute interval presented in pairs.js
 
 ## Install
 
-    $ git clone https://github.com/limenal/sushi-swap-ohm
-    $ cd sushi-swap-ohm
+    $ git clone https://github.com/Mycelium-Lab/olympus_subgraphs.git
+    $ cd sushiswap-ohm
     $ npm install
     
 ## Running the project
