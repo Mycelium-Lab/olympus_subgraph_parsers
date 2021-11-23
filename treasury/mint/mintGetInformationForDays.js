@@ -22,7 +22,7 @@ const dayQuery =`
 
 export async function getMintRewardsByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayForNDays(reformToBigArrayForDays(await getTotalReserveByDaysFromGraph()),startTimestamp,endTimestamp,n)
+        return fillBigArrayForNDay(reformToBigArrayForDay(await getTotalReserveByDayFromGraph()),startTimestamp,endTimestamp,n)
     }
     catch(err)
     {
@@ -30,7 +30,7 @@ export async function getMintRewardsByNDay(startTimestamp=0,endTimestamp=Date.no
     }
 }
 
-async function getTotalReserveByDaysFromGraph(){
+async function getTotalReserveByDayFromGraph(){
     try{
         const dayData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -52,7 +52,7 @@ async function getTotalReserveByDaysFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-function reformToBigArrayForDays(days){
+function reformToBigArrayForDay(days){
     let out=[];
     for(let i=0; i<days.length; i++){
         for(let j=0; j<days[i].dayMint.length; j++){
@@ -67,61 +67,7 @@ function reformToBigArrayForDays(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
-    let out = [];
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),day)
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),day)
-        if (timestamp>endTimestamp) return out;
-        if(timestamp>=startTimestamp){
-            out.push({
-                amount:bigArray[i-1].amount,
-                timestamp:timestamp,
-                recipient:bigArray[i-1].recipient,
-                caller:bigArray[i-1].caller,
-            });
-        }
-        timestamp+=day;
-        while(timestamp<nextTimestamp){
-            if (timestamp>endTimestamp) return out;
-            if(timestamp>=startTimestamp){
-                out.push({
-                    amount:0,
-                    timestamp:timestamp,
-                    recipient:[],
-                    caller:[]
-                });
-            }
-            timestamp+=day;
-        }
-        
-    }
-    out.push({
-      
-        timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),day),
-        amount:bigArray[bigArray.length-1].amount,
-        recipient:bigArray[bigArray.length-1].recipient,
-        caller:bigArray[bigArray.length-1].caller,
-    })
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),day);
-    timestamp+=day;
-    while(timestamp<=endTimestamp){
-        out.push({
-            timestamp:timestamp,
-            amount:0,
-            timestamp:timestamp,
-            recipient:[],
-            caller:[]
-        });
-        timestamp+=day;
-    }
-    return out;
-}
-
-
-function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
+function fillBigArrayForNDay(stakes,startTimestamp,endTime,days){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*day; beginTimestamp < endTime; beginTimestamp += days*day, endTimestamp+=days*day)
     {

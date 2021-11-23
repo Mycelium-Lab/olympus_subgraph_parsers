@@ -28,7 +28,7 @@ const minuteQuery =`
 
 export async function getMintRewardsByNMinut(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayForNMinutes(reformToBigArrayForMinutes(await getTotalReserveByMinutesFromGraph()),startTimestamp,endTimestamp,n)
+        return fillBigArrayForNMinut(reformToBigArrayForMinut(await getTotalReserveByMinutFromGraph()),startTimestamp,endTimestamp,n)
     }
     catch(err)
     {
@@ -36,7 +36,7 @@ export async function getMintRewardsByNMinut(startTimestamp=0,endTimestamp=Date.
     }
 }
 
-async function getTotalReserveByMinutesFromGraph(){
+async function getTotalReserveByMinutFromGraph(){
     try{
         const minuteData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -72,59 +72,7 @@ function reformToBigArrayForMinutes(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForMinutes(bigArray,startTimestamp,endTimestamp){
-    let out = [];
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),minute)
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),minute)
-        if (timestamp>endTimestamp) return out;
-        if(timestamp>=startTimestamp){
-            out.push({
-                amount:bigArray[i-1].amount,
-                timestamp:timestamp,
-                recipient:bigArray[i-1].recipient,
-                caller:bigArray[i-1].caller,
-            });
-        }
-        timestamp+=minute;
-        while(timestamp<nextTimestamp){
-            if (timestamp>endTimestamp) return out;
-            if(timestamp>=startTimestamp){
-                out.push({
-                    amount:0,
-                    timestamp:timestamp,
-                    recipient:[],
-                    caller:[]
-                });
-            }
-            timestamp+=minute;
-        }
-    }
-    out.push({
-        timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),minute),
-        amount:bigArray[bigArray.length-1].amount,
-        recipient:bigArray[bigArray.length-1].recipient,
-        caller:bigArray[bigArray.length-1].caller,
-    })
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),minute);
-    timestamp+=minute;
-    while(timestamp<=endTimestamp){
-        out.push({
-            timestamp:timestamp,
-            amount:0,
-            timestamp:timestamp,
-            recipient:[],
-            caller:[]
-        });
-        timestamp+=minute;
-    }
-
-    return out;
-}
-
-function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
+function fillBigArrayForNMinut(stakes,startTimestamp,endTime,minutes){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
     {

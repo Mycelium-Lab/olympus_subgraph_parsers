@@ -33,10 +33,10 @@ const minuteQuery =`
 
 export async function getDepositByNMinut(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        let bigArray=await reformToBigArrayForMinutes(await getDepositByMinutesFromGraph());
+        let bigArray=await reformToBigArrayForMinut(await getDepositByMinutFromGraph());
      
         for(let i=0;i<bigArray.length;i++){
-            bigArray[i].array=fillBigArrayForNMinutes( bigArray[i].array,startTimestamp,endTimestamp,n);
+            bigArray[i].array=fillBigArrayForNMinut( bigArray[i].array,startTimestamp,endTimestamp,n);
         }
         
         return bigArray;
@@ -46,12 +46,13 @@ export async function getDepositByNMinut(startTimestamp=0,endTimestamp=Date.now(
         console.log(err)
     }
 }
+
 /**
  * struct from subgrph reform to array
  * @param {} days struct from subgrph
  * @returns 
  */
-async function getDepositByMinutesFromGraph(){
+async function getDepositByMinutFromGraph(){
     try{
         const minuteData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -68,7 +69,7 @@ async function getDepositByMinutesFromGraph(){
     }
 }
 
-async function reformToBigArrayForMinutes(days){
+async function reformToBigArrayForMinut(days){
     let out=[];
     let tokens=await getTokens();
     for(let i=0; i<tokens.length; i++){
@@ -93,78 +94,8 @@ async function reformToBigArrayForMinutes(days){
     }
     return out;
 }
-function fillBigArrayForMinues(bigArray,startTimestamp,endTimestamp){
-    let out = [];
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-       
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),minute)
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),minute)
-        if (timestamp>endTimestamp) return out;
-        if(timestamp>=startTimestamp){
-            out.push({
-                timestamp:timestamp,
-                profit:bigArray[i-1].profit,
-                amount:bigArray[i-1].amount,
-                value:bigArray[i-1].value,
-                sender:bigArray[i-1].sender,
-                sumValue:bigArray[i-1].sumValue,
-                sumProfit:bigArray[i-1].sumProfit,
-                sumAmount:bigArray[i-1].sumAmount,
 
-            });
-        }
-        timestamp+=minute;
-        if (timestamp>endTimestamp) return out;
-        while(timestamp<nextTimestamp){
-            if(timestamp>=startTimestamp){
-                out.push({
-                    timestamp:timestamp,
-                    profit:0,
-                    amount:0,
-                    value:0,
-                    sender:[],
-                    sumValue:bigArray[i-1].sumValue,
-                    sumProfit:bigArray[i-1].sumProfit,
-                    sumAmount:bigArray[i-1].sumAmount,
-                });
-            }
-            timestamp+=minute;
-            if (timestamp>endTimestamp) return out;
-
-        }       
-    }
-    
-    out.push({
-        timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),minute),
-        profit:bigArray[bigArray.length-1].profit,
-        amount:bigArray[bigArray.length-1].amount,
-        value:bigArray[bigArray.length-1].value,
-        sender:bigArray[bigArray.length-1].sender,
-        sumValue:bigArray[bigArray.length-1].sumValue,
-        sumProfit:bigArray[bigArray.length-1].sumProfit,
-        sumAmount:bigArray[bigArray.length-1].sumAmount,
-    })
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),minute);
-    timestamp+=minute;
-    while(timestamp<=endTimestamp){
-        out.push({
-            timestamp:timestamp,
-            profit:0,
-            amount:0,
-            value:0,
-            sender:[],
-            sumValue:bigArray[bigArray.length-1].sumValue,
-            sumProfit:bigArray[bigArray.length-1].sumProfit,
-            sumAmount:bigArray[bigArray.length-1].sumAmount,
-        });
-        timestamp+=minute;
-    }
-    return out;
-}
-
-function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
+function fillBigArrayForNMinut(stakes,startTimestamp,endTime,minutes){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
     {

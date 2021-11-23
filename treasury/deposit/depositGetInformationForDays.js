@@ -27,10 +27,10 @@ const dayQuery =`
 
 export async function getDepositByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        let bigArray=await reformToBigArrayForDays(await getDepositByDaysFromGraph());
+        let bigArray=await reformToBigArrayForDay(await getDepositByDayFromGraph());
      
         for(let i=0;i<bigArray.length;i++){
-            bigArray[i].array=fillBigArrayForNDays( bigArray[i].array,startTimestamp,endTimestamp,n);
+            bigArray[i].array=fillBigArrayForNDay( bigArray[i].array,startTimestamp,endTimestamp,n);
         }
         
         return bigArray;
@@ -41,7 +41,7 @@ export async function getDepositByNDay(startTimestamp=0,endTimestamp=Date.now()/
     }
 }
 
-async function getDepositByDaysFromGraph(){
+async function getDepositByDayFromGraph(){
     try{
         const dayData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -63,7 +63,7 @@ async function getDepositByDaysFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-async function reformToBigArrayForDays(days){
+async function reformToBigArrayForDay(days){
     let out=[];
     let tokens=await getTokens();
     for(let i=0; i<tokens.length; i++){
@@ -84,89 +84,13 @@ async function reformToBigArrayForDays(days){
     }
     return out;
 }
+
 /**
  * fills the array and divides it into equal time intervals
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForDays(bigArray,startTimestamp,endTimestamp){
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    let out = [];
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),day)
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),day)
-        if (timestamp>endTimestamp) return out;
-        if(timestamp>=startTimestamp){
-            out.push({
-                timestamp:timestamp,
-                profit:bigArray[i-1].profit,
-                amount:bigArray[i-1].amount,
-                value:bigArray[i-1].value,
-                sender:bigArray[i-1].sender,
-                sumValue:bigArray[i-1].sumValue,
-                sumProfit:bigArray[i-1].sumProfit,
-                sumAmount:bigArray[i-1].sumAmount,
-            });
-        }
-        timestamp+=day;
-        if (timestamp>endTimestamp) return out;
-
-        while(timestamp<nextTimestamp){
-            if (timestamp>endTimestamp) return out;
-
-            if(timestamp>=startTimestamp){
-                out.push({
-                    timestamp:timestamp,
-                    profit:0,
-                    amount:0,
-                    value:0,
-                    sender:[],
-                    sumValue:bigArray[i-1].sumValue,
-                    sumProfit:bigArray[i-1].sumProfit,
-                    sumAmount:bigArray[i-1].sumAmount,
-                });
-            }
-            timestamp+=day;
-            if (timestamp>endTimestamp) return out;
-
-        }       
-    }
-    
-    out.push({
-        timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),day),
-        profit:bigArray[bigArray.length-1].profit,
-        amount:bigArray[bigArray.length-1].amount,
-        value:bigArray[bigArray.length-1].value,
-        sender:bigArray[bigArray.length-1].sender,
-        sumValue:bigArray[bigArray.length-1].sumValue,
-        sumProfit:bigArray[bigArray.length-1].sumProfit,
-        sumAmount:bigArray[bigArray.length-1].sumAmount,
-    })
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),day);
-    timestamp+=day;
-    while(timestamp<=endTimestamp){
-        if (timestamp>endTimestamp) return out;
-
-        if(timestamp>=startTimestamp){
-            out.push({
-                timestamp:timestamp,
-                profit:0,
-                amount:0,
-                value:0,
-                sender:[],
-                sumValue:bigArray[bigArray.length-1].sumValue,
-                sumProfit:bigArray[bigArray.length-1].sumProfit,
-                sumAmount:bigArray[bigArray.length-1].sumAmount,
-            });
-            timestamp+=day;
-        }
-    }
-    return out;
-}
-
-
-function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
+function fillBigArrayForNDay(stakes,startTimestamp,endTime,days){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*day; beginTimestamp < endTime; beginTimestamp += days*day, endTimestamp+=days*day)
     {

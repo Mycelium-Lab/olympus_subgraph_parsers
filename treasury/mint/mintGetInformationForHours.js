@@ -25,7 +25,7 @@ const hourQuery =`
 
 export async function getMintRewardsByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayForNHours(reformToBigArrayForHours(await getTotalReserveByHoursFromGraph()),startTimestamp,endTimestamp,n)
+        return fillBigArrayForNHour(reformToBigArrayForHour(await getTotalReserveByHourFromGraph()),startTimestamp,endTimestamp,n)
     }
     catch(err)
     {
@@ -34,7 +34,7 @@ export async function getMintRewardsByNHour(startTimestamp=0,endTimestamp=Date.n
 }
 
 
-async function getTotalReserveByHoursFromGraph(){
+async function getTotalReserveByHourFromGraph(){
     try{
         const hourData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -55,7 +55,7 @@ async function getTotalReserveByHoursFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-function reformToBigArrayForHours(days){
+function reformToBigArrayForHour(days){
     let out=[];
     for(let i=0; i<days.length; i++){
         for(let j=0; j<days[i].dayMint.length; j++){
@@ -72,183 +72,7 @@ function reformToBigArrayForHours(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForHours(bigArray,startTimestamp,endTimestamp){
-    let out = [];
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),hour)
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),hour)
-        if (timestamp>endTimestamp) return out;
-        if(timestamp>=startTimestamp){
-            out.push({
-                amount:bigArray[i-1].amount,
-                timestamp:timestamp,
-                recipient:bigArray[i-1].recipient,
-                caller:bigArray[i-1].caller,
-            });
-        }
-        timestamp+=hour;
-        while(timestamp<nextTimestamp){
-            if (timestamp>endTimestamp) return out;
-            if(timestamp>=startTimestamp){
-                out.push({
-                    amount:0,
-                    timestamp:timestamp,
-                    recipient:[],
-                    caller:[]
-                });
-            }
-            timestamp+=hour;
-        }
-        
-    }
-    out.push({
-      
-        timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),hour),
-        amount:bigArray[bigArray.length-1].amount,
-        recipient:bigArray[bigArray.length-1].recipient,
-        caller:bigArray[bigArray.length-1].caller,
-    })
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),hour);
-    timestamp+=hour;
-    while(timestamp<=endTimestamp){
-        out.push({
-            timestamp:timestamp,
-            amount:0,
-            timestamp:timestamp,
-            recipient:[],
-            caller:[]
-        });
-        timestamp+=hour;
-    }
-
-    return out;
-}
-
-
-
-
-/**
- * fills the array and divides it into equal time intervals
- * @param {*} bigArray  
- * @returns 
- */
-function fillBigArrayFor4Hours(bigArray,startTimestamp,endTimestamp){
-    let out = [];
-    let fragment=0;
-    let recipient=[];
-    let caller=[];
-    let amount=0;
-    let j=0;
-    while(bigArray[j].timestamp<startTimestamp) j++;
-    if(bigArray[0].timestamp>startTimestamp){
-        let timestamp =getWholePeriodOfTime(startTimestamp,4*hour);
-        while(timestamp<=bigArray[0].timestamp){
-            out.push({
-                amount:0,
-                timestamp:timestamp,
-                recipient:[],
-                caller:[]
-            });
-            timestamp+=4*hour;
-        }
-    }
-    for(let i=j==0?1:j;i<bigArray.length;i++){
-        let nextTimestamp=getWholePeriodOfTime(parseInt(bigArray[i].timestamp),hour)
-        let timestamp=getWholePeriodOfTime(parseInt(bigArray[i-1].timestamp),hour)
-        amount+=bigArray[i-1].amount
-        caller.concat(bigArray[i-1].caller)
-        recipient.concat(bigArray[i-1].recipient)
-        if (timestamp>endTimestamp) return out;
-        if(out.length>0&&timestamp==out[out.length-1].timestamp){
-            out[out.length-1].amount+=amount;
-            out[out.length-1].caller.concat(caller);
-            out[out.length-1].recipient.concat(recipient);
-            amount=0
-            recipient=[]
-            caller=[]
-            continue;
-        }
-        if(timestamp>=startTimestamp){
-            if(timestamp%(4*hour)==0)
-            {
-                out.push({
-                    amount:bigArray[i-1].amount,
-                    timestamp:timestamp,
-                    recipient:bigArray[i-1].recipient,
-                    caller:bigArray[i-1].caller,
-                });
-                amount=0;
-                recipient=[];
-                caller=[];
-            }
-        }
-        timestamp+=hour;
-        fragment++;
-        while(timestamp<nextTimestamp){
-            if(out.length>0&&timestamp==out[out.length-1].timestamp){
-                out[out.length-1].amount+=amount;
-                out[out.length-1].caller.concat(caller);
-                out[out.length-1].recipient.concat(recipient);
-                amount=0
-                recipient=[]
-                caller=[]
-                timestamp+=hour
-                continue;
-            }
-            if (timestamp>endTimestamp) return out;
-            if(timestamp>=startTimestamp){
-                if(timestamp%(4*hour)==0)
-                {
-                    out.push({
-                        amount:amount,
-                        timestamp:timestamp,
-                        recipient:recipient,
-                        caller:caller
-                    });
-                    amount=0;
-                    recipient=[];
-                    caller=[];
-                }
-            }
-            timestamp+=hour;
-            fragment++;
-        }
-        
-    }
-
-    if(out.length>0&&getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),4*hour)==out[out.length-1].timestamp){
-        out[out.length-1].amount+=amount+bigArray[bigArray.length-1].amount;
-        out[out.length-1].recipient.concat(recipient).concat( bigArray[bigArray.length-1].recipient);
-        out[out.length-1].recipient.concat(caller).concat(bigArray[bigArray.length-1].caller);
-       
-    }else{
-        out.push({
-        
-            timestamp:getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),4*hour),
-            amount:bigArray[bigArray.length-1].amount,
-            recipient:bigArray[bigArray.length-1].recipient,
-            caller:bigArray[bigArray.length-1].caller,
-        })
-    }
-    let timestamp =getWholePeriodOfTime(parseInt(bigArray[bigArray.length-1].timestamp),4*hour);
-    timestamp+=4*hour;
-    while(timestamp<=endTimestamp){
-        out.push({
-            timestamp:timestamp,
-            amount:0,
-            timestamp:timestamp,
-            recipient:[],
-            caller:[]
-        });
-        timestamp+=4*hour;
-    }
-    return out;
-}
-
-
-function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
+function fillBigArrayForNHour(stakes,startTimestamp,endTime,hours){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*hour; beginTimestamp < endTime; beginTimestamp += hours*hour, endTimestamp+=hours*hour)
     {
