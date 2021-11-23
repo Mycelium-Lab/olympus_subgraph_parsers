@@ -17,9 +17,9 @@ const dayQuery =`
 
 
 
-export async function getTotalReserveByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getTotalReservesByNDays(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayForNDay(reformToBigArrayForDay( await getTotalReserveByDayFromGraph()),startTimestamp,endTimestamp,n);
+        return fillBigArrayForNDays(reformToBigArrayForDays( await getTotalReservesByDaysFromGraph()),startTimestamp,endTimestamp,n);
     }
     catch(err)
     {
@@ -27,7 +27,7 @@ export async function getTotalReserveByNDay(startTimestamp=0,endTimestamp=Date.n
     }
 }
 
-async function getTotalReserveByDayFromGraph(){
+async function getTotalReservesByDaysFromGraph(){
     try{
         const dayData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,//QmRpuXnecL1xjHgUUMSBaeok9Ggkpdep9KJNMLJxSbDvxZ
@@ -48,7 +48,7 @@ async function getTotalReserveByDayFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-function reformToBigArrayForDay(days){
+function reformToBigArrayForDays(days){
     let out=[];
     for(let i=0; i<days.length; i++){
         for(let j=0; j<days[i].reserversDays.length; j++){         
@@ -63,7 +63,7 @@ function reformToBigArrayForDay(days){
  * @returns 
  */
 
-function fillBigArrayForNDay(stakes,startTimestamp,endTime,days){
+function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*day; beginTimestamp < endTime; beginTimestamp += days*day, endTimestamp+=days*day)
     {

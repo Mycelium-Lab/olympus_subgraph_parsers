@@ -23,9 +23,9 @@ const hourQuery =`
 
   `
 
-export async function getMintRewardsByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getMintRewardsByNHours(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayForNHour(reformToBigArrayForHour(await getTotalReserveByHourFromGraph()),startTimestamp,endTimestamp,n)
+        return fillBigArrayForNHours(reformToBigArrayForHours(await getMintRewardsByHoursFromGraph()),startTimestamp,endTimestamp,n)
     }
     catch(err)
     {
@@ -34,7 +34,7 @@ export async function getMintRewardsByNHour(startTimestamp=0,endTimestamp=Date.n
 }
 
 
-async function getTotalReserveByHourFromGraph(){
+async function getMintRewardsByHoursFromGraph(){
     try{
         const hourData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -55,7 +55,7 @@ async function getTotalReserveByHourFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-function reformToBigArrayForHour(days){
+function reformToBigArrayForHours(days){
     let out=[];
     for(let i=0; i<days.length; i++){
         for(let j=0; j<days[i].dayMint.length; j++){
@@ -72,7 +72,7 @@ function reformToBigArrayForHour(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForNHour(stakes,startTimestamp,endTime,hours){
+function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*hour; beginTimestamp < endTime; beginTimestamp += hours*hour, endTimestamp+=hours*hour)
     {

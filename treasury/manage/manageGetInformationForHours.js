@@ -24,12 +24,12 @@ const hourQuery =`
 `
 
 
-export async function getManageByNHour(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getManageByNHours(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        let bigArray=await reformToBigArrayForHour(await getManageByHourFromGraph());
+        let bigArray=await reformToBigArrayForHours(await getManageByHoursFromGraph());
      
         for(let i=0;i<bigArray.length;i++){
-            bigArray[i].array=fillBigArrayForNHour( bigArray[i].array,startTimestamp,endTimestamp,n);
+            bigArray[i].array=fillBigArrayForNHours( bigArray[i].array,startTimestamp,endTimestamp,n);
         }
         
         return bigArray;
@@ -41,7 +41,7 @@ export async function getManageByNHour(startTimestamp=0,endTimestamp=Date.now()/
 }
 
 
-async function getManageByHourFromGraph(){
+async function getManageByHoursFromGraph(){
     try{
         const hourData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -64,7 +64,7 @@ async function getManageByHourFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-async function reformToBigArrayForHour(days){
+async function reformToBigArrayForHours(days){
     let out=[];
     let tokens=await getTokens();
     for(let i=0; i<tokens.length; i++){
@@ -101,7 +101,7 @@ async function reformToBigArrayForHour(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForNHour(stakes,startTimestamp,endTime,hours){
+function fillBigArrayForNHours(stakes,startTimestamp,endTime,hours){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*3600; beginTimestamp < endTime; beginTimestamp += hours*3600, endTimestamp+=hours*3600)
     {

@@ -21,12 +21,12 @@ const dayQuery =`
 }
   `
 
-export async function getManageByNDay(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getManageByNDays(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        let bigArray=await reformToBigArrayForDay(await getManageByDayFromGraph());
+        let bigArray=await reformToBigArrayForDays(await getManageByDaysFromGraph());
      
         for(let i=0;i<bigArray.length;i++){
-            bigArray[i].array=fillBigArrayForNDay( bigArray[i].array,startTimestamp,endTimestamp,n);
+            bigArray[i].array=fillBigArrayForNDays( bigArray[i].array,startTimestamp,endTimestamp,n);
         }
         
         return bigArray;
@@ -37,7 +37,7 @@ export async function getManageByNDay(startTimestamp=0,endTimestamp=Date.now()/1
     }
 }
 
-async function getManageByDayFromGraph(){
+async function getManageByDaysFromGraph(){
     try{
         const dayData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -59,7 +59,7 @@ async function getManageByDayFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-async function reformToBigArrayForDay(days){
+async function reformToBigArrayForDays(days){
     let out=[];
     let tokens=await getTokens();
     for(let i=0; i<tokens.length; i++){
@@ -85,7 +85,7 @@ async function reformToBigArrayForDay(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForNDay(stakes,startTimestamp,endTime,days){
+function fillBigArrayForNDays(stakes,startTimestamp,endTime,days){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*day; beginTimestamp < endTime; beginTimestamp += days*day, endTimestamp+=days*day)
     {

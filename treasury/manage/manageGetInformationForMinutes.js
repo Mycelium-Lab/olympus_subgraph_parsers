@@ -27,12 +27,12 @@ const minuteQuery =`
 
 
 
-export async function getManageByNMinut(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getManageByNMinutes(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        let bigArray=await reformToBigArrayForMinut(await getManageByMinutFromGraph());
+        let bigArray=await reformToBigArrayForMinutes(await getManageByMinutesFromGraph());
      
         for(let i=0;i<bigArray.length;i++){
-            bigArray[i].array=fillBigArrayForNMinut( bigArray[i].array,startTimestamp,endTimestamp,n);
+            bigArray[i].array=fillBigArrayForNMinutes( bigArray[i].array,startTimestamp,endTimestamp,n);
         }
         
         return bigArray;
@@ -43,7 +43,7 @@ export async function getManageByNMinut(startTimestamp=0,endTimestamp=Date.now()
     }
 }
 
-async function getManageByMinutFromGraph(){
+async function getManageByMinutesFromGraph(){
     try{
         const minuteData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -65,7 +65,7 @@ async function getManageByMinutFromGraph(){
  * @param {} days struct from subgrph
  * @returns 
  */
-async function reformToBigArrayForMinut(days){
+async function reformToBigArrayForMinutes(days){
     let out=[];
     let tokens=await getTokens();
     for(let i=0; i<tokens.length; i++){
@@ -96,7 +96,7 @@ async function reformToBigArrayForMinut(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForNMinut(stakes,startTimestamp,endTime,minutes){
+function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
     {

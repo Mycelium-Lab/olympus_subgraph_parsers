@@ -26,9 +26,9 @@ const minuteQuery =`
 
 
 
-export async function getMintRewardsByNMinut(startTimestamp=0,endTimestamp=Date.now()/1000,n){
+export async function getMintRewardsByNMinutes(startTimestamp=0,endTimestamp=Date.now()/1000,n){
     try{
-        return fillBigArrayForNMinut(reformToBigArrayForMinut(await getTotalReserveByMinutFromGraph()),startTimestamp,endTimestamp,n)
+        return fillBigArrayForNMinutes(reformToBigArrayForMinutes(await getMintRewardsByMinutesFromGraph()),startTimestamp,endTimestamp,n)
     }
     catch(err)
     {
@@ -36,7 +36,7 @@ export async function getMintRewardsByNMinut(startTimestamp=0,endTimestamp=Date.
     }
 }
 
-async function getTotalReserveByMinutFromGraph(){
+async function getMintRewardsByMinutesFromGraph(){
     try{
         const minuteData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -72,7 +72,7 @@ function reformToBigArrayForMinutes(days){
  * @param {*} bigArray  
  * @returns 
  */
-function fillBigArrayForNMinut(stakes,startTimestamp,endTime,minutes){
+function fillBigArrayForNMinutes(stakes,startTimestamp,endTime,minutes){
     let data=[]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*minute; beginTimestamp < endTime; beginTimestamp += minutes*minute, endTimestamp+=minutes*minute)
     {
