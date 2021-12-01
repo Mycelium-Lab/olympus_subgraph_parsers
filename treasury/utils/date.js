@@ -1,3 +1,3 @@
-export function getWholePeriodOfTime(time,period)  {
-    return time-time%period;
+export function getWholePeriodOfTime(time, period) {
+    return time - (time % period)
 }

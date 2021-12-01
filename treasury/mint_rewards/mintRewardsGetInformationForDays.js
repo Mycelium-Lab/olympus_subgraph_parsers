@@ -1,51 +1,39 @@
 import axios from 'axios'
 import { token } from '../config.js'
-import { getTokens } from '../tokens/getTokens.js'
 
 const day = 60 * 60 * 24
 
 const dayQuery = `
 {
-    manageYearEntities(first:1000 orderBy:timestamp){
-     dayManage(first:365 orderBy:timestamp){
-       
-        id
-        amount
+    yearRewardsMintedEntities(first:100 orderBy:timestamp){
+      dayMint(first:365 orderBy:timestamp){
         timestamp
-        sender
-        sumAmount
-       
-     }
-   }
-}
+        amount
+        recipient
+        caller
+      }
+    }
+  }
   `
 
-export async function getManageInfoNDays(
+export async function getMintRewardsInfoNDays(
     startTimestamp = 0,
     endTimestamp = Date.now() / 1000,
     n
 ) {
     try {
-        let bigArray = await reformToBigArrayForDays(
-            await getManageByDaysFromGraph()
+        return fillBigArrayForNDays(
+            reformToBigArrayForDays(await getMintRewardsByDaysFromGraph()),
+            startTimestamp,
+            endTimestamp,
+            n
         )
-
-        for (let i = 0; i < bigArray.length; i++) {
-            bigArray[i].array = fillBigArrayForNDays(
-                bigArray[i].array,
-                startTimestamp,
-                endTimestamp,
-                n
-            )
-        }
-
-        return bigArray
     } catch (err) {
         console.log(err)
     }
 }
 
-async function getManageByDaysFromGraph() {
+async function getMintRewardsByDaysFromGraph() {
     try {
         const dayData = await axios({
             url: `https://api.thegraph.com/subgraphs/id/${token}`,
@@ -54,7 +42,7 @@ async function getManageByDaysFromGraph() {
                 query: dayQuery,
             },
         })
-        return dayData.data.data.manageYearEntities
+        return dayData.data.data.yearRewardsMintedEntities
     } catch (err) {
         console.log(err)
     }
@@ -65,22 +53,11 @@ async function getManageByDaysFromGraph() {
  * @param {} days struct from subgrph
  * @returns
  */
-async function reformToBigArrayForDays(days) {
+function reformToBigArrayForDays(days) {
     let out = []
-    let tokens = await getTokens()
-    for (let i = 0; i < tokens.length; i++) {
-        out.push({
-            token: tokens[i],
-            array: [],
-        })
-    }
     for (let i = 0; i < days.length; i++) {
-        for (let j = 0; j < days[i].dayManage.length; j++) {
-            for (let m = 0; m < tokens.length; m++) {
-                if (days[i].dayManage[j].id.slice(0, 42) == tokens[m]) {
-                    out[m].array.push(days[i].dayManage[j])
-                }
-            }
+        for (let j = 0; j < days[i].dayMint.length; j++) {
+            out.push(days[i].dayMint[j])
         }
     }
     return out
@@ -98,8 +75,8 @@ function fillBigArrayForNDays(stakes, startTimestamp, endTime, days) {
             timestamp: beginTimestamp,
             endTimestamp: endTimestamp,
             amount: 0,
-            sumAmount: data.length == 0 ? 0 : data[data.length - 1].sumAmount,
-            sender: [],
+            recipient: [],
+            caller: [],
         }
         for (let j = 0; j < stakes.length; ++j) {
             if (
@@ -107,8 +84,8 @@ function fillBigArrayForNDays(stakes, startTimestamp, endTime, days) {
                 stakes[j].timestamp < endTimestamp
             ) {
                 obj.amount += Number(stakes[j].amount)
-                obj.sumAmount = Number(stakes[j].sumAmount)
-                obj.sender.concat(stakes[j].sender)
+                obj.recipient.concat(stakes[j].recipient)
+                obj.caller.concat(stakes[j].caller)
             }
         }
         data.push(obj)

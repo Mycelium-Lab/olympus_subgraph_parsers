@@ -1,9 +1,8 @@
 import axios from 'axios'
-import { token } from '../config.js';
+import { token } from '../config.js'
 
 // graphql request for the Graph
-const query=
-`
+const query = `
 {
     tokens(first:1000){
          id
@@ -11,39 +10,31 @@ const query=
  }
 `
 
-
 /**
- * 
+ *
  * @returns all using tokens
  */
-export async function getTokens(){
-    try{
-        return ( await getTokensFromGraph()).map(function(token){
+export async function getTokens() {
+    try {
+        return (await getTokensFromGraph()).map(function (token) {
             return token.id
-        });
-    }
-    catch(err)
-    {
+        })
+    } catch (err) {
         console.log(err)
     }
 }
 
-
-
-
-async function getTokensFromGraph(){
-    try{
+async function getTokensFromGraph() {
+    try {
         const dayData = await axios({
-            url: `https://api.thegraph.com/subgraphs/id/${token}`,//QmRpuXnecL1xjHgUUMSBaeok9Ggkpdep9KJNMLJxSbDvxZ
+            url: `https://api.thegraph.com/subgraphs/id/${token}`, //QmRpuXnecL1xjHgUUMSBaeok9Ggkpdep9KJNMLJxSbDvxZ
             method: 'post',
             data: {
-              query: query
-            }
-          })
-        return dayData.data.data.tokens;
-    }
-    catch(err)
-    {
+                query: query,
+            },
+        })
+        return dayData.data.data.tokens
+    } catch (err) {
         console.log(err)
     }
 }
